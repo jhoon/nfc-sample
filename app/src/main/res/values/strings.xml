@@ -1,6 +1,8 @@
 <resources>
     <string name="app_name">NFC Sample</string>
     <string name="action_settings">Settings</string>
+    <string name="instructions">Find another device and put them together on the backs to Beam™!</string>
+
     <!-- the app's own MIME type -->
     <string name="mime_type">mytype/pe.jota.nfcsample</string>
 </resources>
