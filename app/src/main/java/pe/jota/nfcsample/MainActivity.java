@@ -2,7 +2,9 @@ package pe.jota.nfcsample;
 
 import android.content.Intent;
 import android.nfc.NdefMessage;
+import android.nfc.NdefRecord;
 import android.nfc.NfcAdapter;
+import android.nfc.NfcEvent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.design.widget.FloatingActionButton;
@@ -14,8 +16,10 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity
+        implements NfcAdapter.CreateNdefMessageCallback{
     private static final String LOG_TAG = AppCompatActivity.class.getSimpleName();
+    NfcAdapter mNfcAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +36,16 @@ public class MainActivity extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
+
+        // Check for available NFC Adapter
+        mNfcAdapter = NfcAdapter.getDefaultAdapter(this);
+        if (mNfcAdapter == null) {
+            Snackbar.make(findViewById(R.id.toolbar), "NFC is not available", Snackbar.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+        // Register callback
+        mNfcAdapter.setNdefPushMessageCallback(this, this);
     }
 
     @Override
@@ -77,10 +91,25 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        // Print the received messages to the console
         if (msgs != null) {
             for(int i = 0; i < msgs.length; i++) {
                 Log.d(LOG_TAG, "Message " + i + " received: " + msgs[i]);
             }
         }
+    }
+
+    @Override
+    public NdefMessage createNdefMessage(NfcEvent event) {
+        String text = ("Hello NFC!");
+        NdefMessage msg = new NdefMessage(
+                new NdefRecord[] {
+                        NdefRecord.createMime(
+                                getString(R.string.mime_type), text.getBytes()),
+        // TODO: replace this test app record for the actual one ("pe.jota.nfcsample")
+                        NdefRecord.createApplicationRecord("com.applica.sarcasm")
+                });
+        Log.d(LOG_TAG, "sending NFC...");
+        return msg;
     }
 }
