@@ -82,10 +82,21 @@ public class MainActivity extends AppCompatActivity
 
         // Print the received messages to the console
         if (msgs != null) {
-            for(int i = 0; i < msgs.length; i++) {
-                Log.d(LOG_TAG, "Message " + i + " received: " + msgs[i]);
+            NdefRecord[] records = msgs[0].getRecords();
+
+            // Checking the contents of the NFC Message being received
+            for(int i = 0; i < records.length; i++) {
+                Log.d(LOG_TAG, "Record " + i + " received: " + records[i]);
+                Log.d(LOG_TAG, "Record " + i + " received.toMimeType: " + records[i].toMimeType());
+                Log.d(LOG_TAG, "Record " + i + " String(getPayload): " +new String(records[i].getPayload()));
             }
+
+            // Showing an Snackbar with the message sent through NFC
+            Snackbar.make(findViewById(R.id.toolbar),
+                    new String(records[0].getPayload()), Snackbar.LENGTH_LONG).show();
         }
+
+        // All this portion of code can also be placed in the onCreate overriding method.
     }
 
     @Override
@@ -93,10 +104,13 @@ public class MainActivity extends AppCompatActivity
         String text = ("Hello NFC!");
         NdefMessage msg = new NdefMessage(
                 new NdefRecord[] {
+                        // It is recommended that the first record uses the custom mimeType
+                        // defined for the app, ensuring backwards compatibility
                         NdefRecord.createMime(
                                 getString(R.string.mime_type), text.getBytes()),
-        // TODO: replace this test app record for the actual one ("pe.jota.nfcsample")
-                        NdefRecord.createApplicationRecord("com.applica.sarcasm")
+                        // Also, in order to open an specific app with this NFC Message,
+                        // an Android Aplication Record can be created for that purpose
+                        NdefRecord.createApplicationRecord("pe.jota.nfcsample")
                 });
         Log.d(LOG_TAG, "sending NFC...");
         return msg;
