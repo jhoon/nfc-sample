@@ -13,6 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 public class MainActivity extends AppCompatActivity
         implements NfcAdapter.CreateNdefMessageCallback{
@@ -114,5 +115,10 @@ public class MainActivity extends AppCompatActivity
                 });
         Log.d(LOG_TAG, "sending NFC...");
         return msg;
+    }
+
+    public void sendViaNFC(View view) {
+        NfcAdapter adapter = NfcAdapter.getDefaultAdapter(this);
+        adapter.invokeBeam(this);
     }
 }
